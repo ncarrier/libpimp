@@ -13,3 +13,5 @@ add_executable(pimp-example example/main.c)
 target_link_libraries(pimp-example
     pimp)
 install(TARGETS pimp-example DESTINATION bin)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
