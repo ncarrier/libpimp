@@ -9,9 +9,9 @@ set(PIMP_SOURCES ${PIMP_SOURCES} ${PIMP_HEADERS})
 add_library(pimp SHARED ${PIMP_SOURCES})
 install(TARGETS pimp DESTINATION lib)
 
-add_executable(pimp-example example/main.c)
-target_link_libraries(pimp-example
+add_executable(pimp-echo examples/echo/main.c)
+target_link_libraries(pimp-echo
     pimp)
-install(TARGETS pimp-example DESTINATION bin)
+install(TARGETS pimp-echo DESTINATION bin)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
