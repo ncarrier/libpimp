@@ -152,78 +152,58 @@ static socklen_t addr_len(struct addr *addr)
 }
 
 
-FILE *pimp_server(const char *address, int flags, int backlog)
+int pimp_server(const char *address, int flags, int backlog)
 {
 	int ret;
-	int fd;
 	int old_errno;
-	FILE *server;
+	int server;
 	struct addr addr;
 
 	ret = addr_from_str(&addr, address);
 	if (ret != 0) {
 		errno = -ret;
-		return NULL;
+		return -1;
 	}
 
-	fd = socket(addr.addr.sa_family, SOCK_STREAM | flags, 0);
-	if (fd == -1)
-		return NULL;
+	server = socket(addr.addr.sa_family, SOCK_STREAM | flags, 0);
+	if (server == -1)
+		return -1;
 
 	socklen_t len = addr_len(&addr);
-	ret = bind(fd, &addr.addr, len);
+	ret = bind(server, &addr.addr, len);
 	if (ret == -1) {
 		old_errno = errno;
-		close(fd);
+		close(server);
 		errno = old_errno;
-		return NULL;
+		return -1;
 	}
 
-	ret = listen(fd, backlog);
+	ret = listen(server, backlog);
 	if (ret == -1) {
 		old_errno = errno;
-		close(fd);
+		close(server);
 		errno = old_errno;
-		return NULL;
-	}
-	server = fdopen(fd, "r+");
-	if (server == NULL) {
-		old_errno = errno;
-		close(fd);
-		errno = old_errno;
-		return NULL;
-	}
-	ret = setvbuf(server, NULL, _IONBF, 0);
-	if (ret != 0) {
-		old_errno = errno;
-		fclose(server);
-		errno = old_errno;
-		return NULL;
+		return -1;
 	}
 
 	return server;
 }
 
-FILE *pimp_accept(FILE *server, int flags)
+FILE *pimp_accept(int server, int flags)
 {
 	int ret;
-	int fd;
 	int fdc;
 	int old_errno;
 	FILE *client;
 	struct addr addr;
 
-	if (server == NULL) {
+	if (server < 0) {
 		errno = EINVAL;
 		return NULL;
 	}
 
-	fd = fileno(server);
-	if (fd == -1)
-		return NULL;
-
 	addr.len = sizeof(addr.un); // TODO check that
-	fdc = accept4(fd, &addr.addr, &addr.len, flags);
+	fdc = accept4(server, &addr.addr, &addr.len, flags);
 	if (fdc == -1)
 		return NULL;
 	addr.type = addr.addr.sa_family;

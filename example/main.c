@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	bool is_server;
 	const char *mode;
 	const char *address;
-	FILE *server;
+	int server;
 	FILE *client;
 
 	if (argc != 3)
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 				"\"client\"\n");
 	if (is_server) {
 		server = pimp_server(address, 0, 10);
-		if (server == NULL)
+		if (server == -1)
 			error(EXIT_FAILURE, errno, "pimp_server");
 
 		client = pimp_accept(server, 0);

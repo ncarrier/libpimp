@@ -5,9 +5,9 @@
 
 #define PIMP_API __attribute__((visibility("default")))
 
-PIMP_API FILE *pimp_server(const char *address, int flags, int backlog);
+PIMP_API int pimp_server(const char *address, int flags, int backlog);
 
-PIMP_API FILE *pimp_accept(FILE *server, int flags);
+PIMP_API FILE *pimp_accept(int server, int flags);
 
 PIMP_API FILE *pimp_client(const char *address, int flags);
 
